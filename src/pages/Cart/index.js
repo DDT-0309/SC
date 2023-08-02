@@ -2,21 +2,43 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { DELETE_ITEM_CART, UPDATE_CART } from "../../shared/constants/action-type";
 import { getImageProduct } from "../../shared/ultils";
+import { useNavigate } from "react-router-dom";
+import { oder } from "../../services/Api";
 
 
 const Cart = ()=>{
   const [inputs, setInputs] = React.useState({});
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const carts = useSelector(({Cart})=>{
     return Cart.items;
   });
 
-  const evenHander =()=>{
-    return(
+  const onClickOder = (e)=>{
+      e.preventDefault();
+      const items = carts.map((cart)=>({prd_id: cart._id, qty: cart.qty}));
+      oder({
+        items,
+        ...inputs
+      }).then(({data})=>{
+        if(data.status==="success"){
+          return navigate("/Success");
+        }
+      });
 
-    )
-  };
+  }
+
+  const onChangInputs = (e)=>{
+      const {name, value} = (e.target);
+      setInputs({...inputs, [name]: value});
+  }
+
+  // const evenHander =()=>{
+  //   return(
+
+  //   )
+  // };
 
   const deleteItemCart = (e, _id)=>{
     e.preventDefault();
@@ -110,23 +132,23 @@ const Cart = ()=>{
   <div id="customer">
     <form method="post">
       <div className="row">
-        <div onChange={onChangInputs} id="customer-name" className="col-lg-4 col-md-4 col-sm-12">
+        <div onChange={onChangInputs} value={inputs?.name} id="customer-name" className="col-lg-4 col-md-4 col-sm-12">
           <input placeholder="Họ và tên (bắt buộc)" type="text" name="name" className="form-control" required />
         </div>
-        <div onChange={onChangInputs} id="customer-phone" className="col-lg-4 col-md-4 col-sm-12">
+        <div onChange={onChangInputs} value={inputs?.phone} id="customer-phone" className="col-lg-4 col-md-4 col-sm-12">
           <input placeholder="Số điện thoại (bắt buộc)" type="text" name="phone" className="form-control" required />
         </div>
-        <div onChange={onChangInputs} id="customer-mail" className="col-lg-4 col-md-4 col-sm-12">
+        <div onChange={onChangInputs} value={inputs?.name} id="customer-mail" className="col-lg-4 col-md-4 col-sm-12">
           <input placeholder="Email (bắt buộc)" type="text" name="email" className="form-control" required />
         </div>
-        <div onChange={onChangInputs} id="customer-add" className="col-lg-12 col-md-12 col-sm-12">
+        <div onChange={onChangInputs} value={inputs?.name} id="customer-add" className="col-lg-12 col-md-12 col-sm-12">
           <input placeholder="Địa chỉ nhà riêng hoặc cơ quan (bắt buộc)" type="text" name="address" className="form-control" required />
         </div>
       </div>
     </form>
     <div className="row">
       <div className="by-now col-lg-6 col-md-6 col-sm-12">
-        <a href="#">
+        <a onClick={onClickOder} href="#">
           <b>Mua ngay</b>
           <span>Giao hàng tận nơi siêu tốc</span>
         </a>
